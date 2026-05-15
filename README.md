@@ -91,7 +91,3 @@ Nepal is UTC+5:45. To run at a different Nepal time:
 - **403 / bot detection** → Playwright with a real browser should bypass this, but if not, try adding a short `page.wait_for_timeout(2000)` after `page.goto()`.
 
 ---
-
-## Cost
-
-**Free.** GitHub Actions gives 2,000 free minutes/month on public repos and 500 on private. This job takes ~2 minutes per run × 30 days = ~60 minutes/month.

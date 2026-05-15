@@ -1,0 +1,62 @@
+name: NEPSE IPO Alert
+
+on:
+  # Runs every day at 05:15 UTC = 11:00 AM Nepal Time (UTC+5:45)
+  schedule:
+    - cron: "15 5 * * *"
+
+  # Allow manual trigger from GitHub Actions tab (useful for testing)
+  workflow_dispatch:
+
+jobs:
+  check-ipo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── 1. Checkout repo ─────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Restore IPO cache (seen_ipos.json) ────────────────────────────
+      #    This is how the bot "remembers" which IPOs it has already alerted.
+      #    The cache key changes only when the file itself changes, so it
+      #    persists across daily runs.
+      - name: Restore IPO cache
+        uses: actions/cache@v4
+        with:
+          path: seen_ipos.json
+          key: ipo-cache-${{ hashFiles('seen_ipos.json') }}
+          restore-keys: |
+            ipo-cache-
+
+      # ── 3. Set up Python ─────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ── 4. Install Python dependencies ───────────────────────────────────
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium
+          playwright install-deps chromium
+
+      # ── 5. Run the IPO checker ───────────────────────────────────────────
+      - name: Run IPO checker
+        env:
+          EMAIL_SENDER:   ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        run: python check_ipo.py
+
+      # ── 6. Save updated cache back ───────────────────────────────────────
+      #    Even if no new IPOs were found, we save the cache so it is
+      #    available for the next run.
+      - name: Save IPO cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: seen_ipos.json
+          key: ipo-cache-${{ hashFiles('seen_ipos.json') }}

@@ -367,18 +367,18 @@ def main() -> None:
 
     print(f"[main] Total scraped: {len(ipos)}, currently open: {len(open_ipos)}")
 
-    if not open_ipos:
-        today = datetime.now().strftime("%Y-%m-%d")
-        recent = sorted(
-            ipos,
-            key=lambda ipo: parse_ipo_date(ipo.get("open_date", "")) or datetime.min.date(),
-            reverse=True,
-        )[:3]
+    # if not open_ipos:
+    #     today = datetime.now().strftime("%Y-%m-%d")
+    #     recent = sorted(
+    #         ipos,
+    #         key=lambda ipo: parse_ipo_date(ipo.get("open_date", "")) or datetime.min.date(),
+    #         reverse=True,
+    #     )[:3]
 
-        subject, html = build_no_openings_html(today, recent)
-        send_email(subject, html)
-        print("[main] No IPO openings found today — notification sent.")
-        return
+    #     subject, html = build_no_openings_html(today, recent)
+    #     send_email(subject, html)
+    #     print("[main] No IPO openings found today — notification sent.")
+    #     return
 
     new_ipos = [i for i in open_ipos if make_ipo_id(i) not in seen]
     print(f"[main] New (not yet alerted): {len(new_ipos)}")

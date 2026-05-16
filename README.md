@@ -1,4 +1,4 @@
-# NEPSE IPO Alert Bot 🔔
+# NEPSE IPO Alert Bot 
 
 Automatically checks [nepalipaisa.com/ipo](https://nepalipaisa.com/ipo) every day at **11:00 AM Nepal Time** and sends you an email if any new IPOs are open for application.
 
